@@ -46,7 +46,7 @@ This establishes that the administrative endpoint performs a server-side role ch
 
 Review of the authentication implementation revealed that the JWT signing secret is hardcoded directly in the application source code:
 
-const JWT_SECRET = 'devsecops-secret-key';
+const JWT_SECRET = '[REDACTED_JWT_SECRET]';
 
 The secret is also used by the JWT verification middleware.
 
@@ -74,7 +74,7 @@ HTTP 403 Forbidden
 
 The JWT signing secret was discovered in application source code:
 
-devsecops-secret-key
+[REDACTED_JWT_SECRET]
 
 Using the exposed secret, a new JWT was generated with the same user identity but an elevated role:
 
@@ -109,7 +109,32 @@ Potential impact includes:
 The vulnerability is caused by insecure secret management rather than the HS256 algorithm itself.
 
 ## 5. Root Cause
+The root cause was insecure management of the JWT signing secret.
+
+The application stored the HS256 signing secret directly in source code and duplicated the secret across authentication components. Because HS256 uses a shared signing secret, anyone who obtained the source code could potentially create valid tokens with modified claims.
+
+The vulnerability was therefore caused by secret exposure and insecure secret management, not by the HS256 algorithm itself.
 
 ## 6. Remediation
+The hardcoded JWT secret was removed from the application source code.
+
+A cryptographically random 256-bit secret was generated and stored in an environment variable.
+
+The application now loads the secret through a centralized configuration module and fails to start if JWT_SECRET is not configured.
+
+The .env file is excluded from version control through .gitignore.
+
+This prevents the signing secret from being embedded directly in the application source and ensures the authentication and verification components use the same centrally managed secret.
 
 ## 7. Validation
+The original forged administrative JWT was replayed after remediation.
+
+Before remediation:
+- Forged JWT: HTTP 200 OK
+- Administrative information was returned
+
+After remediation:
+- Same forged JWT: HTTP 401 Unauthorized
+- Token signature was rejected
+
+The remediation therefore successfully invalidated the previously forged token.

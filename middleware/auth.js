@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = 'devsecops-secret-key';
+const { jwtSecret } = require('../config');
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -14,7 +14,7 @@ function authenticateToken(req, res, next) {
     const token = authHeader.split(' ')[1];
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, jwtSecret);
         req.user = decoded;
         next();
     } catch (error) {

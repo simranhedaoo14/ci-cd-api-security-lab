@@ -4,7 +4,7 @@ const users = require('../data/users');
 
 const router = express.Router();
 
-const JWT_SECRET = 'devsecops-secret-key';
+const { jwtSecret } = require('../config');
 
 router.post('/login', (req, res) => {
     const { username, password } = req.body;
@@ -25,7 +25,7 @@ router.post('/login', (req, res) => {
             username: user.username,
             role: user.role
         },
-        JWT_SECRET
+        jwtSecret
     );
 
     res.json({
