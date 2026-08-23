@@ -81,8 +81,10 @@ jobs:
 
       - name: Start API
         run: |
+          export JWT_SECRET="$(openssl rand -hex 32)"
           nohup node server.js > server.log 2>&1 &
           sleep 5
+          cat server.log
           curl --fail http://127.0.0.1:3000/health
 
       - name: Run OWASP ZAP baseline scan
