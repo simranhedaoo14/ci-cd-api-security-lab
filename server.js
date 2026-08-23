@@ -1,3 +1,4 @@
+const helmet = require('helmet');
 const express = require('express');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
@@ -9,6 +10,8 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.disable('x-powered-by');
+app.use(helmet());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
