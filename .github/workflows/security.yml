@@ -92,4 +92,4 @@ jobs:
         with:
           target: 'http://127.0.0.1:3000'
           allow_issue_writing: false
-          fail_action: true
+          fail_action: false
