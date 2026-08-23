@@ -24,3 +24,22 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  semgrep:
+      name: SAST - Semgrep
+      runs-on: ubuntu-latest
+
+      container:
+        image: semgrep/semgrep
+
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Run Semgrep
+          run: |
+            semgrep scan \
+              --config p/javascript \
+              --error \
+              --exclude node_modules/
