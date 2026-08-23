@@ -93,3 +93,33 @@ jobs:
           target: 'http://127.0.0.1:3000'
           allow_issue_writing: false
           fail_action: false
+
+  security-gate:
+    name: Security Gate
+    runs-on: ubuntu-24.04
+
+    needs:
+      - gitleaks
+      - semgrep
+      - trivy
+      - zap
+
+    if: ${{ always() }}
+
+    steps:
+      - name: Evaluate security checks
+        run: |
+          echo "Gitleaks: ${{ needs.gitleaks.result }}"
+          echo "Semgrep:  ${{ needs.semgrep.result }}"
+          echo "Trivy:    ${{ needs.trivy.result }}"
+          echo "ZAP:      ${{ needs.zap.result }}"
+
+          if [ "${{ needs.gitleaks.result }}" != "success" ] || \
+             [ "${{ needs.semgrep.result }}" != "success" ] || \
+             [ "${{ needs.trivy.result }}" != "success" ] || \
+             [ "${{ needs.zap.result }}" != "success" ]; then
+            echo "❌ Security Gate FAILED"
+            exit 1
+          fi
+
+          echo "✅ Security Gate PASSED"
