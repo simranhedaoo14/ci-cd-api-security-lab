@@ -43,3 +43,21 @@ jobs:
               --config p/javascript \
               --error \
               --exclude node_modules/
+
+  trivy:
+    name: Dependency Scan - Trivy
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
